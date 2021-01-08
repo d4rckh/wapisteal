@@ -2,7 +2,7 @@
 Steal credentials on Windows by hooking several Windows API functions!
 
 # how it works
-- hooks `CreateProcessWithLogonW` from `Advapi32.dll`
+- hooks `CreateProcessWithLogonW`, `CredIsMarshaledCredentialW` and `CredReadW` from `Advapi32.dll`
 - waits for new calls
 - prints the parameters 
 - continues with execution 
