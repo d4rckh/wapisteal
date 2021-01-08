@@ -7,7 +7,8 @@ Stop = False
 cmd = ""
 
 def on_message(message, data):
-    parseData(message["payload"])
+    if "payload" in message:
+        parseData(message["payload"])
 
 def main(target_process):
     session = frida.attach(target_process)

